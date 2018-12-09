@@ -21,7 +21,7 @@ public class PriceService implements Runnable {
 
     @Override
     public void run() {
-        //TODO 第二方案: 在两个线程中分别放入countDownLatch,两个服务一旦完成就会通知priceService线程
+        //第二方案: 在两个线程中分别放入countDownLatch,两个服务一旦完成就会通知priceService线程
         //TODO 也许简单的wait notify就可以了
         ExecutorService cachedThreadPool = ThreadPool.getThreadPool();
         CyclicBarrier cyclicBarrier = new CyclicBarrier(2);//确保两个线程一起开始
@@ -33,6 +33,7 @@ public class PriceService implements Runnable {
         cachedThreadPool.submit(new MonthTask(cyclicBarrier, index, monthLatch));
 
         waitResult(gisLatch, monthLatch);
+        System.out.println(this.index + "PriceService thread finish! " + System.currentTimeMillis());
     }
 
     private void waitResult(CountDownLatch gisLatch, CountDownLatch monthLatch) {
@@ -40,7 +41,7 @@ public class PriceService implements Runnable {
         try {
             boolean gisLatchReachZero = gisLatch.await(Constant.MAX_WAIT_MILLISECONDS, TimeUnit.MILLISECONDS);
             if (!gisLatchReachZero) {
-                System.out.println("gis service time out!!!");
+                System.out.println(index + "gis service time out!!!");
                 return;
             }
 
@@ -53,8 +54,6 @@ public class PriceService implements Runnable {
             } else {
                 System.out.println(index + "price don't wait monthService end!!  status =1");
             }
-
-            System.out.println(this.index + "PriceService thread finish! " + System.currentTimeMillis());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

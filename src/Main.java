@@ -12,7 +12,8 @@ public class Main {
 
         long start = System.currentTimeMillis();
         System.out.println("PriceService start!" + start);
-        int priceServiceNum = 5;
+        int priceServiceNum = 7;  //每一个priceService对应了三个线程(price + gis + month)
+        //现在的逻辑有点问题，当3*7 >线程池核心线程数时便可能出现gis timeout的处理
         try {
             cachedThreadPool.execute(new ChangeStatusService());//线程定时修改status
             for (int i = 0; i < priceServiceNum; i++) {

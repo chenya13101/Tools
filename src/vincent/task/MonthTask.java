@@ -17,7 +17,7 @@ public class MonthTask extends BaseTask {
         try {
             super.getBarrier().await();
 
-            System.out.println(getIndex() + "month task start " + System.currentTimeMillis());
+            //System.out.println(getIndex() + "month task start " + System.currentTimeMillis());
             long random = ThreadLocalRandom.current().nextLong(150, 400);
             System.out.println(getIndex() + "month random " + random);
             Thread.sleep(random);
