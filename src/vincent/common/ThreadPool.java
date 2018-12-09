@@ -8,7 +8,7 @@ public class ThreadPool {
     }
 
     private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Constant.CORE_POOL_SIZE,
-            Constant.MAXINUM_POOL_SIZE,
+            Constant.MAXIMUM_POOL_SIZE,
             1,
             TimeUnit.MINUTES,
             new ArrayBlockingQueue<>(50));
