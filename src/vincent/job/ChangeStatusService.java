@@ -2,7 +2,7 @@ package vincent.job;
 
 import vincent.common.StatusManager;
 
-public class ChangeStatusService extends Thread {
+public class ChangeStatusService implements Runnable {
 
     @Override
     public void run() {

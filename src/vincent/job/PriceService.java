@@ -23,13 +23,13 @@ public class PriceService implements Runnable {
     public void run() {
         //TODO 第二方案: 在两个线程中分别放入countDownLatch,两个服务一旦完成就会通知priceService线程
         //TODO 也许简单的wait notify就可以了
-        ExecutorService cachedThreadPool = ThreadPool.getCachedThreadPool();
+        ExecutorService cachedThreadPool = ThreadPool.getThreadPool();
         CyclicBarrier cyclicBarrier = new CyclicBarrier(2);//确保两个线程一起开始
         CountDownLatch gisLatch = new CountDownLatch(1);
         CountDownLatch monthLatch = new CountDownLatch(1);
 
         cachedThreadPool.submit(new GisTask(cyclicBarrier, index, gisLatch));
-        //sleep();//判断gis与 month是否同时启动
+        sleep();//判断gis与 month是否同时启动
         cachedThreadPool.submit(new MonthTask(cyclicBarrier, index, monthLatch));
 
         waitResult(gisLatch, monthLatch);
@@ -38,7 +38,7 @@ public class PriceService implements Runnable {
     private void waitResult(CountDownLatch gisLatch, CountDownLatch monthLatch) {
         //TODO 最好得到返回值
         try {
-            boolean gisLatchReachZero = gisLatch.await(Constant.MAX_WAIT_MILLSECONDS, TimeUnit.MILLISECONDS);
+            boolean gisLatchReachZero = gisLatch.await(Constant.MAX_WAIT_MILLISECONDS, TimeUnit.MILLISECONDS);
             if (!gisLatchReachZero) {
                 System.out.println("gis service time out!!!");
                 return;
@@ -46,25 +46,26 @@ public class PriceService implements Runnable {
 
             if (StatusManager.getStatus() == 0) {
                 System.out.println("priceService" + index + " joining monthThread,index == " + this.index + "; status = 0; monthLatch =" + monthLatch.getCount());
-                System.out.println(System.currentTimeMillis());
-                monthLatch.await(Constant.MAX_WAIT_MILLSECONDS, TimeUnit.MILLISECONDS);
-                System.out.println(System.currentTimeMillis());
+
+                System.out.println(this.index + "price wait monthLatch start :" + System.currentTimeMillis());
+                monthLatch.await(Constant.MAX_WAIT_MILLISECONDS, TimeUnit.MILLISECONDS);
+                System.out.println(this.index + "price wait monthLatch end :" + System.currentTimeMillis());
             } else {
-                System.out.println("don't wait monthService end!!  status =1");
+                System.out.println(index + "price don't wait monthService end!!  status =1");
             }
 
-            System.out.println(this.index + "PriceService thread finish!" + System.currentTimeMillis());
+            System.out.println(this.index + "PriceService thread finish! " + System.currentTimeMillis());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-//    private void sleep() {
-//        try {
-//            Thread.sleep(25);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
+    private void sleep() {
+        try {
+            Thread.sleep(15);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

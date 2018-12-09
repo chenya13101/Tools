@@ -8,26 +8,24 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("PriceService start!");
-        ExecutorService cachedThreadPool = ThreadPool.getCachedThreadPool();
+        ExecutorService cachedThreadPool = ThreadPool.getThreadPool();
 
+        long start = System.currentTimeMillis();
+        System.out.println("PriceService start!" + start);
+        int priceServiceNum = 5;
         try {
-            ChangeStatusService changeStatusService = new ChangeStatusService();//线程定时修改status
-            cachedThreadPool.execute(changeStatusService);
-
-            for (int i = 0; i < 1; i++) {
-                //价格服务线程
-                cachedThreadPool.execute(new PriceService(i));
+            cachedThreadPool.execute(new ChangeStatusService());//线程定时修改status
+            for (int i = 0; i < priceServiceNum; i++) {
+                cachedThreadPool.execute(new PriceService(i)); //价格服务线程
             }
 
-            changeStatusService.join();
-
-
-            Thread.sleep(200);
+            Thread.sleep(50);
             cachedThreadPool.shutdown();
-            cachedThreadPool.awaitTermination(25, TimeUnit.SECONDS);
+            cachedThreadPool.awaitTermination(10, TimeUnit.SECONDS);
 
-            System.out.println("main thread finish!" + System.currentTimeMillis());
+            long end = System.currentTimeMillis();
+            //long sec = (end - start) / 1000;
+            System.out.println("main thread finish! " + end + " time= " + (end - start));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

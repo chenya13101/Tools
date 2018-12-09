@@ -16,9 +16,10 @@ public class GisTask extends BaseTask {
         try {
             this.getBarrier().await();
 
-            System.out.println(getIndex() + "git task start");
-            Thread.sleep(ThreadLocalRandom.current().nextLong(250, 750));
-            System.out.println(getIndex() + "git task finish");
+            long random = ThreadLocalRandom.current().nextLong(250, 750);
+            System.out.println(getIndex() + "gis random " + random);
+            Thread.sleep(random);
+            System.out.println(getIndex() + "gis task finish " + System.currentTimeMillis());
 
             this.getLatch().countDown();
         } catch (InterruptedException | BrokenBarrierException e) {

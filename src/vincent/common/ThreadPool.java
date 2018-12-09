@@ -3,7 +3,7 @@ package vincent.common;
 import java.util.concurrent.*;
 
 public class ThreadPool {
-    public static ThreadPoolExecutor getCachedThreadPool() {
+    public static ThreadPoolExecutor getThreadPool() {
         return threadPoolExecutor;
     }
 
@@ -11,7 +11,7 @@ public class ThreadPool {
             50,
             1,
             TimeUnit.MINUTES,
-            new ArrayBlockingQueue<Runnable>(50));
+            new ArrayBlockingQueue<>(50));
 
 
 }
