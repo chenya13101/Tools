@@ -7,8 +7,8 @@ public class ThreadPool {
         return threadPoolExecutor;
     }
 
-    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(20,
-            50,
+    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Constant.CORE_POOL_SIZE,
+            Constant.MAXINUM_POOL_SIZE,
             1,
             TimeUnit.MINUTES,
             new ArrayBlockingQueue<>(50));

@@ -37,11 +37,12 @@ public class PriceService implements Runnable {
     }
 
     private void waitResult(CountDownLatch gisLatch, CountDownLatch monthLatch) {
-        //TODO 最好得到返回值
         try {
             boolean gisLatchReachZero = gisLatch.await(Constant.MAX_WAIT_MILLISECONDS, TimeUnit.MILLISECONDS);
             if (!gisLatchReachZero) {
-                System.out.println(index + "gis service time out!!!");
+                //price线程在 MAX_WAIT_MILLISECONDS ms内没有获得gis服务的结束通知，不再等待
+                //但是线程池缓冲队列中的gis和month线程会继续执行
+                System.out.println(index + "gis service time out!!! price service back");
                 return;
             }
 

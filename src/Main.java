@@ -12,8 +12,15 @@ public class Main {
 
         long start = System.currentTimeMillis();
         System.out.println("PriceService start!" + start);
-        int priceServiceNum = 7;  //每一个priceService对应了三个线程(price + gis + month)
-        //现在的逻辑有点问题，当3*7 >线程池核心线程数时便可能出现gis timeout的处理
+        int priceServiceNum = 8;  //每一个priceService对应了三个线程(price + gis + month)
+        /*
+        现在的逻辑有点问题，当3 * priceServiceNum >线程池核心线程数时便可能出现gis await timeout的处理
+        想要减少timeout频率:
+            1.增加Constant.MAX_WAIT_MILLISECONDS
+            2.扩大线程池容量
+            2.将线程池拆分为pricePool和sonPool,核心线程数量设置为1:2
+            3.就控制新增price服务的频率
+         */
         try {
             cachedThreadPool.execute(new ChangeStatusService());//线程定时修改status
             for (int i = 0; i < priceServiceNum; i++) {
@@ -25,12 +32,10 @@ public class Main {
             cachedThreadPool.awaitTermination(10, TimeUnit.SECONDS);
 
             long end = System.currentTimeMillis();
-            //long sec = (end - start) / 1000;
             System.out.println("main thread finish! " + end + " time= " + (end - start));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 
     }
 }
