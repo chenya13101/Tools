@@ -16,7 +16,7 @@ public class ChangeStatusService implements Runnable {
             }
 
             try {
-                Thread.sleep(101);
+                Thread.sleep(61);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

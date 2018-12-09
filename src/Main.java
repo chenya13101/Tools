@@ -29,9 +29,10 @@ public class Main {
 
             Thread.sleep(50);
             cachedThreadPool.shutdown();
-            cachedThreadPool.awaitTermination(10, TimeUnit.SECONDS);
+            cachedThreadPool.awaitTermination(10, TimeUnit.SECONDS);//主要是等待ChangeStatusService线程结束
 
             long end = System.currentTimeMillis();
+
             System.out.println("main thread finish! " + end + " time= " + (end - start));
         } catch (InterruptedException e) {
             e.printStackTrace();
