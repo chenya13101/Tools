@@ -1,12 +1,15 @@
 package vincent.job;
 
+import vincent.common.Constant;
 import vincent.common.StatusManager;
 import vincent.common.ThreadPool;
 import vincent.task.GisTask;
 import vincent.task.MonthTask;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class PriceService implements Runnable {
 
@@ -18,27 +21,34 @@ public class PriceService implements Runnable {
 
     @Override
     public void run() {
-        ExecutorService cachedThreadPool = ThreadPool.getCachedThreadPool();
-
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
-
-        //TODO 第一方案：这里使用线程不合理，换成jdk8 lambda来做，不要自己去new Thread
         //TODO 第二方案: 在两个线程中分别放入countDownLatch,两个服务一旦完成就会通知priceService线程
-        Thread gisThread = new Thread(new GisTask(cyclicBarrier, index));
-        cachedThreadPool.execute(gisThread);
+        //TODO 也许简单的wait notify就可以了
+        ExecutorService cachedThreadPool = ThreadPool.getCachedThreadPool();
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(2);//确保两个线程一起开始
+        CountDownLatch gisLatch = new CountDownLatch(1);
+        CountDownLatch monthLatch = new CountDownLatch(1);
 
+        cachedThreadPool.submit(new GisTask(cyclicBarrier, index, gisLatch));
         sleep();//判断gis与 month是否同时启动
+        cachedThreadPool.submit(new MonthTask(cyclicBarrier, index, monthLatch));
 
-        Thread monthThread = new Thread(new MonthTask(cyclicBarrier, index));
-        cachedThreadPool.execute(monthThread);
-        // monthThread.start();
+        waitResult(gisLatch, monthLatch);
+    }
 
+    private void waitResult(CountDownLatch gisLatch, CountDownLatch monthLatch) {
+        //TODO 最好得到返回值
         try {
-            gisThread.join();
-            int status = StatusManager.getStatus();
-            if (status == 0) {
-                System.out.println("priceService" + index + " join monthThread,index == " + this.index + "; status =" + status);
-                monthThread.join();
+            boolean gisLatchReachZero = gisLatch.await(Constant.MAX_WAIT_MILLSECONDS, TimeUnit.MILLISECONDS);
+            if (!gisLatchReachZero) {
+                System.out.println("gis service time out!!!");
+                return;
+            }
+
+            if (StatusManager.getStatus() == 0) {
+                System.out.println("priceService" + index + " joining monthThread,index == " + this.index + "; status = 0");
+                monthLatch.await(Constant.MAX_WAIT_MILLSECONDS, TimeUnit.MILLISECONDS);
+            } else {
+                System.out.println("don't wait monthService end!!  status =1");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

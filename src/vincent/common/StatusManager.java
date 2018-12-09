@@ -9,7 +9,8 @@ public class StatusManager {
     }
 
     public static void setStatus(int status) {
-        System.out.println("set status =" + status);
+        //if (status == 1)
+        //    System.out.println("set status =" + status);
         StatusManager.status = status;
     }
 

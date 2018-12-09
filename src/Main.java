@@ -3,6 +3,7 @@ import vincent.job.ChangeStatusService;
 import vincent.job.PriceService;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -12,15 +13,19 @@ public class Main {
 
         try {
             ChangeStatusService changeStatusService = new ChangeStatusService();//线程定时修改status
-            cachedThreadPool.execute(changeStatusService);//changeStatusService.start();
+            cachedThreadPool.execute(changeStatusService);
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 1; i++) {
                 //价格服务线程
-                Thread priceService = new Thread(new PriceService(i));
-                cachedThreadPool.execute(priceService);
+                cachedThreadPool.execute(new PriceService(i));
             }
 
             changeStatusService.join();
+
+
+            Thread.sleep(2000);
+            cachedThreadPool.shutdown();
+            cachedThreadPool.awaitTermination(25, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
