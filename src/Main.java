@@ -23,14 +23,15 @@ public class Main {
             changeStatusService.join();
 
 
-            Thread.sleep(2000);
+            Thread.sleep(200);
             cachedThreadPool.shutdown();
             cachedThreadPool.awaitTermination(25, TimeUnit.SECONDS);
+
+            System.out.println("main thread finish!" + System.currentTimeMillis());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
 
-        System.out.println("PriceService end!");
     }
 }

@@ -29,7 +29,7 @@ public class PriceService implements Runnable {
         CountDownLatch monthLatch = new CountDownLatch(1);
 
         cachedThreadPool.submit(new GisTask(cyclicBarrier, index, gisLatch));
-        sleep();//判断gis与 month是否同时启动
+        //sleep();//判断gis与 month是否同时启动
         cachedThreadPool.submit(new MonthTask(cyclicBarrier, index, monthLatch));
 
         waitResult(gisLatch, monthLatch);
@@ -45,22 +45,26 @@ public class PriceService implements Runnable {
             }
 
             if (StatusManager.getStatus() == 0) {
-                System.out.println("priceService" + index + " joining monthThread,index == " + this.index + "; status = 0");
+                System.out.println("priceService" + index + " joining monthThread,index == " + this.index + "; status = 0; monthLatch =" + monthLatch.getCount());
+                System.out.println(System.currentTimeMillis());
                 monthLatch.await(Constant.MAX_WAIT_MILLSECONDS, TimeUnit.MILLISECONDS);
+                System.out.println(System.currentTimeMillis());
             } else {
                 System.out.println("don't wait monthService end!!  status =1");
             }
+
+            System.out.println(this.index + "PriceService thread finish!" + System.currentTimeMillis());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private void sleep() {
-        try {
-            Thread.sleep(25);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
+//    private void sleep() {
+//        try {
+//            Thread.sleep(25);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 }

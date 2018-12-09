@@ -15,12 +15,13 @@ public class MonthTask extends BaseTask {
     @Override
     public void run() {
         try {
-            this.getBarrier().await();
+            super.getBarrier().await();
 
             System.out.println(getIndex() + "month task start");
             Thread.sleep(ThreadLocalRandom.current().nextLong(150, 350));
-            System.out.println(getIndex() + " month task finish");
+            System.out.println(getIndex() + "month task finish");
 
+            super.getLatch().countDown();
         } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
         }
