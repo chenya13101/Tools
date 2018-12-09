@@ -18,8 +18,9 @@ public class Main {
         想要减少timeout频率:
             1.增加Constant.MAX_WAIT_MILLISECONDS
             2.扩大线程池容量
-            2.将线程池拆分为pricePool和sonPool,核心线程数量设置为1:2
-            3.就控制新增price服务的频率
+            3.将线程池拆分为pricePool和sonPool,核心线程数量设置为1:2
+            4.控制新增price服务的频率,使用semaphore来管理令牌
+            5.应用层面就负载均衡
          */
         try {
             cachedThreadPool.execute(new ChangeStatusService());//线程定时修改status
